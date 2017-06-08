@@ -192,7 +192,7 @@ class polynomial
     return answer ;
   }
 
-  inline polynomial operator- (const polynomial&& p) const
+  inline polynomial operator- (const polynomial& p) const
   {
     polynomial answer = *this;
     return answer -= p;

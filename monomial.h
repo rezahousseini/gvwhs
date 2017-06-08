@@ -5,7 +5,7 @@
 #include <vector>
 #include <iosfwd>
 
-#include "term-order.h"
+#include "term_order.h"
 
 template<int n, class ORDERINIG, class T = short>
 class monomial

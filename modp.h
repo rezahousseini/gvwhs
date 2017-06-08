@@ -52,6 +52,7 @@ class modp
   inline modp& operator*= (modp enn)
   {
     n = (n * enn.n) % p;
+    return *this;
   }
 
   inline modp inv () const

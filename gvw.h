@@ -5,9 +5,9 @@
 #include <fstream>
 #include <iosfwd>
 #include <vector>
-#include <list >
+#include <list>
 #include <queue>
-#include "j−pair.h"
+#include "j_pair.h"
 #include "polynomial.h"
 #include "polyQueue.h"
 #include <iterator>
@@ -17,149 +17,167 @@
 #include "poly_formatter.h"
 #include "pqueue.h"
 
-using namespace std ;
+using namespace std;
 
-extern const char ∗ sing ;
+extern const char *sing;
 int jPairs = 0;
-template<class term , class mod_elt>
 
+template<class term, class mod_elt>
 class gvw
 {
-public :
+  public:
 
-  typedef polynomial<term> poly ;
-  typedef vector<poly> polyList ;
-  typedef j pair <mod_elt , poly> jpair ;
-  typedef typename mod_elt::monomial_mod_mon;
-  typedef typename poly::coefficient_coefficient ;
-  typedef typename poly::monomial_monom;
-  typedef typename mod_elt::mod_order_module_ordering ;
+  typedef polynomial<term> poly;
+  typedef vector<poly> polyList;
+  typedef j_pair<mod_elt, poly> jpair;
+  typedef typename mod_elt::monomial mod_mon;
+  typedef typename poly::coefficient coefficient;
+  typedef typename poly::monomial monom;
+  typedef typename mod_elt::mod_order module_ordering;
 
-  gvw(poly_formatter<poly> *format, const char *name = "gb") :
-    reg0red(0), sup0red(0), polyFormatter(format),
-    isReduced(false), isGroebner(false)
+  gvw (poly_formatter<poly> *format, const char *name = "gb") :
+       polyFormatter (format),
+       isGroebner (false),
+       isReduced (false),
+       reg0red (0),
+       sup0red (0)
   {
-    polyList vee = polyFormatter−>getBasis ();
+    polyList vee = polyFormatter->getBasis ();
+
     /////////////// RUN THE ALGORITHM ///////////////////
     ////// THIS STUFF COULD BE IN FUNCTION MAIN() ///////
-    calculateGB ( vee );
+    calculateGB (vee);
+
 #ifdef BRIEF
-    printBriefStatistics ( cout );
+    printBriefStatistics (cout);
 #else
-    printStatistics (cout , true );
+    printStatistics (cout, true);
 #endif
-    // uncomment for the basis output to a f i l e
-    // ostringstream str ;
-    // str << ”output/” << name << ”. txt ”;
-    // ofstream f i l e ( str . str (). c str ());
-    // // f i l e << sing << endl ;
-    // f i l e << ” ideal j = ideal ();” << endl ;
-    // // polyFormatter−>updateBasis ( getBasis ());
-    // // polyFormatter−>printBasis ( file , ”j ”);
-    // makeMinimal ();
-    // vector<poly> ∗ vec = &V;
-    // if (vec−>empty ()) vec = &minimalBasis ;
-    // for ( int i = 0; i < vec−>size (); i++) {
-    // f i l e << ”j [” << ( i+1) << ”] = ”;
-    // polyFormatter−>printPoly ( file , vec−>operator []( i ));
-    // f i l e << ”;” << endl ;
-    // }
-    // f i l e << ” validate2ideals ( sortIdeal ( j ) ,
-    // makeMonic( groebner ( i )));” << endl ;
+
+    // uncomment for the basis output to a file
+    ostringstream str;
+    str << "output/" << name << ".txt";
+    ofstream file (str.str ().c_str ());
+    // file << sing << endl;
+    file << "ideal j = ideal ();" << endl;
+    // polyFormatter−>updateBasis ( getBasis ());
+    // polyFormatter−>printBasis ( file , ”j ”);
+    makeMinimal ();
+    vector<poly> *vec = &V;
+    if (vec->empty ()) vec = &minimalBasis;
+    for (size_t i = 0; i < vec->size (); i++) 
+      {
+        file << "j[" << (i+1) << "] = ";
+        polyFormatter->printPoly (file, vec->operator [](i));
+        file << ";" << endl;
+      }
+    // file << " validate2ideals (sortIdeal (j), makeMonic (groebner (i)));" << endl;
   }
 
-  const polyList& getBasis()
+  const polyList& getBasis ()
   {
-    if (! minimalBasis . empty ())
-      return minimalBasis ;
+    if (!minimalBasis.empty ())
+      return minimalBasis;
     else return V;
   }
 
-  const polyList& getMinimalBasis()
+  const polyList& getMinimalBasis ()
   {
     makeMinimal ();
-    return minimalBasis ;
+    return minimalBasis;
   }
 
-  const polyList& getReducedBasis()
+  const polyList& getReducedBasis ()
   {
     makeReduced ();
-    return minimalBasis ;
+    return minimalBasis;
   }
 
-  void calculateGB (const polyList & vee )
+  void calculateGB (const polyList &vee)
   {
-    if ( isGroebner ) return ;
-    mod_elt::set generators ( vee );
-    H. resize ( vee . size ());
-    for ( int i = 0; i < vee . size (); i++)
-      JPairs.enqueue( jpair ( mod elt ( i ) , vee [ i ] ) ) ;
-    while (! JPairs . empty ())
-      processJPair ( JPairs . dequeue ());
-    isGroebner = true ;
-    sizeOfBasis = V. size ();
+    if (isGroebner) return;
+    mod_elt::set_generators (vee);
+    H.resize (vee.size ());
+    for (size_t i = 0; i < vee.size (); i++)
+      JPairs.enqueue (jpair (mod_elt (i), vee[i]));
+    while (!JPairs.empty ())
+      processJPair (JPairs.dequeue ());
+    isGroebner = true;
+    sizeOfBasis = V.size ();
   }
 
-private :
+  private:
 
-  int findReductor (const mod elt & u, const term & v , monom & scale )
+  vector<vector<mod_mon> > H;
+  pqueue<jpair> JPairs;
+  vector<mod_elt> U;
+  polyList V;
+  vector<monom> VLeadMonoms;
+  polyList minimalBasis;
+  poly_formatter<poly> *polyFormatter;
+  bool isGroebner, isReduced; 
+
+  // statistics
+  int reg0red, sup0red;
+  int sizeOfBasis;
+
+  int findReductor (const mod_elt& u, const term& v, monom& scale)
   {
-    // −1 = No Reductor , −2 = Super Top−Reducible
-    int answer = −1;
-    for ( int i = 0; i < VLeadMonoms. size (); i++)
+    // -1 = No Reductor , -2 = Super Top-Reducible
+    int answer = -1;
+    for (size_t i = 0; i < VLeadMonoms.size (); i++)
       {
-        if (v.m(). isDivisibleBy (VLeadMonoms[ i ]))
+        if (v.m().isDivisibleBy (VLeadMonoms[i]))
           {
-            scale = v.m() / VLeadMonoms[ i ] ;
-            mod elt scaledSig = U[ i ] ∗ scale ;
-            if ( scaledSig < u) return i ;
-            if ( scaledSig == u) answer = −2;
+            scale = v.m() / VLeadMonoms[i];
+            mod_elt scaledSig = U[i]*scale ;
+            if (scaledSig < u) return i;
+            if (scaledSig == u) answer = -2;
           }
       }
-    return answer ;
+    return answer;
   }
 
-  int regReduce( mod elt & u, poly & v)
+  int regReduce (mod_elt &u, poly &v)
   {
-    int result = topReduce(u,v );
-    if ( result < 0) return result ;
-    poly vee ;
-    while (! v. isZero ())
+    int result = topReduce (u, v);
+    if (result < 0) return result;
+    poly vee;
+    while (!v.isZero ())
       {
-        vee . push back (v. lt ());
-        v. pop front ();
-        topReduce(u,v );
+        vee.push_back (v.lt ());
+        v.pop_front ();
+        topReduce (u, v);
       }
     v = vee ;
-    return −1;
+    return -1;
   }
 
-  int topReduce(mod_elt& u, poly& v)
+  int topReduce (mod_elt& u, poly& v)
   {
     // POLYQUEUE
-    const coefficient one (1);
-    if (v.isZero ()) return −1;
+    if (v.isZero ()) return -1;
     monom scale;
-    polyQueue<poly> queue(v);
+    polyQueue<poly> queue (v);
     while (true)
       {
         if (queue.isZero ())
           {
             // new syzygy
             v = poly ();
-            return −1;
+            return -1;
           }
-        int reductor = findReductor (u, queue.lt(), scale);
-        if (reductor == −2)
+        int reductor = findReductor (u, queue.lt (), scale);
+        if (reductor == -2)
           {
             // irreducible but not primitive
-            return −2;
+            return -2;
           }
-        if (reductor == −1)
+        if (reductor == -1)
           {
             // primitive
             v = queue.toPoly ();
-            return reductor ;
+            return reductor;
           }
         coefficient c = queue.lc() / V[reductor].lc();
         queue.sub2cancel (V[reductor] * term(scale, c));
@@ -211,7 +229,7 @@ private :
         jPairs++;
         poly v = jp.vPolynomial(V);
         int result = regReduce(u, v);
-        if (result == −2)   // super top−reducible
+        if (result == -2)   // super top-reducible
           {
             sup0red++;
             return ;
@@ -226,13 +244,13 @@ private :
         U.push_back (u);
         V.push_back (v);
         VLeadMonoms.push_back (v.lm());
-        updatePairs (U.size() − 1);
+        updatePairs (U.size() - 1);
       }
   }
 
   bool isMPair (const mod_elt& u, const monom& lm)
   {
-    for (int i = 0; i < U.size(); i++)
+    for (size_t i = 0; i < U.size(); i++)
       {
         if (u.isDivisibleBy(U[i]))
           {
@@ -251,7 +269,7 @@ private :
         for (int j = 0; j < H[i].size(); j++)
           {
             cout << " " << (i+1) << " , ";
-            polyFormatter−>printMonom (cout, H[i][j], false);
+            polyFormatter->printMonom (cout, H[i][j], false);
             cout << endl;
           }
       }
@@ -262,7 +280,7 @@ private :
     const mod_mon& mon = m.m();
     int pos = m.idx();
     const vector<mod_mon>& HList = H[pos];
-    for (int i = 0; i < HList.size (); i++)
+    for (size_t i = 0; i < HList.size (); i++)
       if (mon.isDivisibleBy (HList[i])) return true;
     return false ;
   }
@@ -305,7 +323,7 @@ private :
       {
         dividend = divisor;
         for (++dividend; dividend != minimal.end();)
-          if ( dividend−>isDivisibleBy (*divisor))
+          if (dividend->isDivisibleBy (*divisor))
             dividend = minimal.erase (dividend);
           else ++dividend;
       }
@@ -313,7 +331,7 @@ private :
     for (itr = minimal.begin ();
          itr != minimal.end ();
          itr = minimal.erase (itr))
-      minimalBasis.push_back (itr−>makeMonic());
+      minimalBasis.push_back (itr->makeMonic());
   }
 
   void makeReduced ()
@@ -331,9 +349,9 @@ private :
       {
         // generator i is now fully reduced
         int changed = 0;
-        for ( j = i − 1; j >= 0; j−−)
+        for (j = i - 1; j >= 0; j--)
           changed += minimalBasis[i].divideThrough (minimalBasis[j]);
-        if (changed) −−i; // redo it
+        if (changed) --i; // redo it
       }
     isReduced = true ;
     for (int i = 0; i < minimalBasis.size (); ++i)
@@ -342,50 +360,38 @@ private :
 
   void printStatistics (ostream& o, bool min = true)
   {
-    o << "\nAlgorithm Statistics :" << endl;
-    o << " −JPairs processed :      " << jPairs << endl;
+    o << "\nAlgorithm Statistics:" << endl;
+    o << " - JPairs processed:                  " << jPairs << endl;
     if (min && minimalBasis.empty()) makeMinimal();
     if (min)
-      o << " −Size of Groebner Basis (minimal): " << minimalBasis.size() << endl;
-    o << " −Size of Groebner Basis (computed): " << sizeOfBasis << endl;
-    o << " −Regular Zero Reductions :        " << reg0red << endl;
-    o << " −Super Top−reductions :        " << sup0red << endl;
+      o << " - Size of Groebner Basis (minimal):  " << minimalBasis.size() << endl;
+    o << " - Size of Groebner Basis (computed): " << sizeOfBasis << endl;
+    o << " - Regular Zero Reductions:           " << reg0red << endl;
+    o << " - Super Top-reductions:              " << sup0red << endl;
+
     ostringstream str;
     int sizeOfH = 0;
     str << " [ ";
-    for (int i = 0; i < H.size(); i++)
+    for (size_t i = 0; i < H.size(); i++)
       {
         if ( i ) str << " , " ;
         sizeOfH += H[i].size (); // changed Hnew to H
         str << H[i].size ();
       }
     str << " ] ";
-    o << " −Size of H: " << sizeOfH << " " << str.str () << endl;
+    o << " - Size of H: " << sizeOfH << " " << str.str () << endl;
     o << endl;
   }
 
   void printBriefStatistics (ostream& o)
   {
-    o << "MODE " << module ordering::mode << " : (" ;
+    o << "MODE " << module_ordering::mode << " : (" ;
     if (minimalBasis.empty ()) makeMinimal ();
     o << jPairs << " , " << minimalBasis.size () << "/ " << sizeOfBasis;
     int sizeOfH = 0;
     for (int i = 0; i < H.size (); i++)
       sizeOfH += H[i].size ();
     o << " , " << sizeOfH << " , " << reg0red << " , " << sup0red;
-  }
-
-  /*∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗∗*/
-  vector<vector<mod_mon> > H;
-  pqueue<jpair> JPairs ;
-  vector<mod_elt> U;
-  polyList V;
-  vector<monom> VLeadMonoms;
-  polyList minimalBasis ;
-  bool isGroebner , isReduced ;
-  poly formatter<poly> ∗ polyFormatter ;
-  // statistics
-  int reg0red , sup0red ;
-  int sizeOfBasis ;
+  } 
 };
 #endif

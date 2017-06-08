@@ -2,7 +2,7 @@
 #ifndef ATERMH
 #define ATERMH
 
-#include "term-order.h"
+#include "term_order.h"
 
 #include <iosfwd>
 
@@ -123,7 +123,7 @@ class aTerm
 
   inline operator bool () const
   {
-    return static cast<bool>(myCoefficient);
+    return static_cast<bool>(myCoefficient);
   }
 
   inline bool isDivisibleBy (const aTerm& x) const

@@ -97,11 +97,11 @@ class pqueue
       }
   }
 
-  void bubble_down (int start_pos = 1)   // receives 1−based indexing
+  void bubble_down (size_t start_pos = 1)   // receives 1−based indexing
   {
     if (start_pos*2 <= array.size ())
       {
-        int theSmaller = start_pos*2;
+        size_t theSmaller = start_pos*2;
         if (theSmaller + 1 <= array.size () &&
             array[theSmaller - 1] > array[theSmaller + 1 - 1]) theSmaller++;
         if (array[theSmaller - 1] < array[start_pos - 1])

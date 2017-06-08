@@ -2,7 +2,7 @@
 #ifndef SINGULAR_H
 #define SINGULAR_H
 
-#include "poly-formatter.h"
+#include "poly_formatter.h"
 
 #include <iostream>
 #include <map>
@@ -21,6 +21,7 @@ template<class poly>
 class singular : public poly_formatter<poly>
 {
   public:
+
   typedef typename poly::monomial monomial;
   typedef typename monomial::expType expType;
   typedef typename poly::coefficient coefficient;
@@ -73,17 +74,17 @@ class singular : public poly_formatter<poly>
 
   void printBasis (std::ostream& o, const std::string& idealName)
   {
-    for (int i = 0; i < poly_formatter<poly>::theBasis.size (); i++)
+    for (size_t i = 0; i < poly_formatter<poly>::theBasis.size (); i++)
       {
-        o << idealName << " [ " << (i + 1) << " ] = ";
+        o << idealName << "[" << (i + 1) << "] = ";
         printPoly (o, poly_formatter<poly>::theBasis[i]);
-        o << " ;" << std::endl;
+        o << ";" << std::endl;
       }
   }
 
   int addPolynomial (const std::string& p)
   {
-    if (debug) std::cerr << "−−−−−−Calling addPolynomial on " << p << std::endl;
+    if (debug) std::cerr << "-------Calling addPolynomial on " << p << std::endl;
     size_t start = 0, end = p.length ();
     int monomialCount = 0;
 // term is negative , the ’−’ needs to be position 0
@@ -91,9 +92,9 @@ class singular : public poly_formatter<poly>
     while (start <= p.length () - 1)
       {
         monomialCount++;
-        end = p.findfirstof ("+−", start + 1);
+        end = p.find_first_of ("+-", start + 1);
         if (end > p.length ()) end = p.length ();
-        if (debug) std::cerr << "−−−−−−−Calling getNextMon on " 
+        if (debug) std::cerr << "-------Calling getNextMon on " 
                              << p.substr (start, end - start) 
                              << " " << std::endl;
         thisPoly += getNextMon(p, start, end);
@@ -108,9 +109,9 @@ class singular : public poly_formatter<poly>
   term getNextMon (const std::string& p, size_t& start, size_t end)
   {
     if (debug) std::cerr << "Over [ " << start << " , " << end << " ): ";
-    if (p[start] == "+") ++start;
-    bool negative = (p[start] == "−") ? true : false;
-    if (debug && negative) std::cerr << "NEG ";
+    if (p[start] == '+') ++start;
+    bool negative = (p[start] == '-') ? true : false;
+    if (debug && negative) std::cerr << "NEG";
     if (negative) ++start;
     int intCoeff = 1;
     if (isdigit (p[start]))
@@ -127,7 +128,7 @@ class singular : public poly_formatter<poly>
       {
         start = p.find_first_not_of (" ∗", start);
         std::string varName(1, p[start++]);
-        if (p[start] == " ( " )
+        if (p[start] == '(' )
           {
             int lastParen = p.find_first_not_of ("(0123456789)", start);
             varName += p.substr (start, lastParen - start);
@@ -138,7 +139,7 @@ class singular : public poly_formatter<poly>
             std::cerr << "\tvarName(" << varName << ") " << "varIdx ("
                       << poly_formatter<poly>::varMapping[varName] << ") ";
           }
-        if (p[start] == "^ ") ++start;
+        if (p[start] == '^') ++start;
         if (isdigit (p[start]))
           {
             int lastOfExp = p.find_first_not_of ("1234567890", start);

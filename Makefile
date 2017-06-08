@@ -1,10 +1,10 @@
 exList = katsura5 katsura6 katsura7 katsura8 schrans−troost \
 	 f633 cyclic6 cyclic7 cyclic8 cyclic9 cyclic10
-shortList = katsura5 katsura6 katsura7 katsura8 schrans−troost \
+shortList = katsura5 #katsura6 katsura7 katsura8 schrans−troost \
 	    f633 cyclic6 cyclic7 cyclic8
 longList = cyclic7 cyclic8 #cyclic9 cyclic10
 modeList = POT TOP g1 g2
-optflags = -O3 -loops
+optflags = -O3 -Wall #-loops
 
 fast :
 	@for i in $(shortList);\
@@ -17,8 +17,11 @@ fast :
 		wait;\
 	done
 
-sturmfels : sturmfels.cpp gvw.h
+sturmfels: sturmfels.cpp gvw.h
 	g++ -o sturmfels $(optflags) sturmfels.cpp
+
+lazard: lazard.cpp gvw.h
+	g++ -o lazard $(optflags) lazard.cpp
 
 bigFast :
 	@for i in $(longList);\

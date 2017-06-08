@@ -25,22 +25,22 @@ class polyQueue
 
   ~polyQueue ()
   {
-    for (int i = 0; i < array.size (); i++) delete array[i];
+    for (size_t i = 0; i < array.size (); i++) delete array[i];
   }
 
   inline const coeff lc () const
   {
-    return array[0]−>lc ();
+    return array[0]->lc ();
   }
 
   inline const monom& lm() const
   {
-    return array[0]−>lm ();
+    return array[0]->lm ();
   }
 
   inline const term& lt () const
   {
-    return array[0]−>lt ();
+    return array[0]->lt ();
   }
 
   inline bool isZero () const
@@ -65,9 +65,9 @@ class polyQueue
 
   void sub2cancel (const poly& p)
   {
-    poly* q = new poly (−p);
-    array[0]−>pop_front (); // leading terms just cancelled
-    if (array[0]−>isZero ())
+    poly* q = new poly (-p);
+    array[0]->pop_front (); // leading terms just cancelled
+    if (array[0]->isZero ())
       {
         delete array[0];
         array [0] = array.back ();
@@ -76,8 +76,8 @@ class polyQueue
         mults.pop_back ();
       }
     bubble_down (1);
-    q−>pop_front ();
-    if (!q−>isZero ())
+    q->pop_front ();
+    if (!q->isZero ())
       {
         array.push_back (q);
         mults.push_back (coeff (1));
@@ -93,8 +93,8 @@ class polyQueue
     while (!isZero ())
       {
         answer.push_back (lt ());
-        array[0]−>pop_front ();
-        if (array[0]−>isZero ())
+        array[0]->pop_front ();
+        if (array[0]->isZero ())
           {
             delete array[0];
             array[0] = array.back ();
@@ -115,7 +115,7 @@ class polyQueue
     const coeff one (1);
     if (mults[0] != one)
       {
-        array[0]−>operator*= (mults[0]);
+        array[0]->operator*= (mults[0]);
         mults[0] = one ;
       }
   }
@@ -126,14 +126,14 @@ class polyQueue
     while (!array.empty() && repeat)
       {
         repeat = false ;
-        for (int pos = 1; pos <= 2; pos++)
+        for (size_t pos = 1; pos <= 2; pos++)
           {
-            if (array.size () > pos && array[pos]−>lm() == array[0]−>lm())
+            if (array.size () > pos && array[pos]->lm() == array[0]->lm())
               {
                 repeat = true;
-                array[0]−>addCoeff2LC (array[pos]−>lc ()*mults[pos]/mults[0]);
-                array[pos]−>pop_front ();
-                if (array[pos]−>isZero ())
+                array[0]->addCoeff2LC (array[pos]->lc ()*mults[pos]/mults[0]);
+                array[pos]->pop_front ();
+                if (array[pos]->isZero ())
                   {
                     delete array [pos] ;
                     array[pos] = array.back ();
@@ -144,10 +144,10 @@ class polyQueue
                 bubble_down (pos+1);
               }
           }
-        if (array[0]−>lc ().isZero ())
+        if (array[0]->lc ().isZero ())
           {
-            array[0]−>pop_front ();
-            if (array[0]−>isZero ())
+            array[0]->pop_front ();
+            if (array[0]->isZero ())
               {
                 delete array[0];
                 array[0] = array.back ();
@@ -166,25 +166,25 @@ class polyQueue
   {
     while (pos > 1) 
       {
-        if (array[pos − 1]−>lm() <= array [(pos >> 1) − 1]−>lm()) break;
-        std::swap (array[pos − 1], array[(pos >> 1) − 1]);
-        std::swap (mults[pos − 1], mults[(pos >> 1) − 1]);
+        if (array[pos - 1]->lm() <= array [(pos >> 1) - 1]->lm()) break;
+        std::swap (array[pos - 1], array[(pos >> 1) - 1]);
+        std::swap (mults[pos - 1], mults[(pos >> 1) - 1]);
         pos >>= 1;
       }
   }
 
-  void bubble_down (int pos = 1)   // one based argument
+  void bubble_down (size_t pos = 1)   // one based argument
   {
     if (pos << 1 <= array.size ())
       {
-        int theLarger = pos << 1;
+        size_t theLarger = pos << 1;
         if (theLarger + 1 <= array.size ()
-             && array[theLarger − 1]−>lm() < array[theLarger]−>lm())
+             && array[theLarger - 1]->lm() < array[theLarger]->lm())
           theLarger++;
-        if (array[theLarger − 1]−>lm() > array[pos − 1]−>lm())
+        if (array[theLarger - 1]->lm() > array[pos - 1]->lm())
           {
-            std::swap (array[theLarger − 1], array[pos − 1]);
-            std::swap (mults[theLarger − 1], mults[pos − 1]);
+            std::swap (array[theLarger - 1], array[pos - 1]);
+            std::swap (mults[theLarger - 1], mults[pos - 1]);
             bubble_down (theLarger);
           }
       }

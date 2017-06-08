@@ -5,7 +5,7 @@
 #include <iosfwd>
 #include <vector>
 
-template<class mod _elt, class poly>
+template<class mod_elt, class poly>
 
 class j_pair
 {
@@ -19,13 +19,13 @@ class j_pair
   j_pair (const monomial& theirScale, int index, const mod_elt& usig,
           const monomial& vpoly, int tc) : 
       u(usig* theirScale),
-      v(vpoly* theirScale), 
-      origUVIdx(index),
+      v(vpoly* theirScale),
       scale(theirScale), 
+      origUVIdx(index),
       termCount(tc) { }
 
-  j_pair (const mod_elt& u1, const poly& v1) : u(u1), v(v1.lm()),
-                                               origUVIdx(-1), p(v1)
+  j_pair (const mod_elt& u1, const poly& v1) : p(v1), u(u1), v(v1.lm()),
+                                               origUVIdx(-1)
   {
     termCount = p.size ();
   }
@@ -101,7 +101,7 @@ class j_pair
   poly p;
   mod_elt u;
   monomial v;
-  int origUVIdx, termCount;
   monomial scale;
+  int origUVIdx, termCount; 
 };
 #endif
