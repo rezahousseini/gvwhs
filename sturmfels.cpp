@@ -1,6 +1,6 @@
-#include<fstream>
-#include<vector>
-#include<iostream>
+#include <fstream>
+#include <vector>
+#include <iostream>
 #include "modp.h"
 #include "monomial.h"
 #include "polynomial.h"

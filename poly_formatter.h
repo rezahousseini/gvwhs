@@ -31,7 +31,7 @@ class poly_formatter
     revMapping.push_back (s);
     if (revMapping.size () > monomial::numVars)
       {
-        std::cerr << "ERROR: Inserted more than " << monomial:: numVars
+        std::cerr << "ERROR: Inserted more than " << monomial::numVars
                   << " variables .\n\n" << std::endl;
         exit (1);
       }
@@ -40,7 +40,8 @@ class poly_formatter
 
   int addVariables (std::string c[], int n)
   {
-    for (int i = 0; i < n; i++) addVariable (c[i]);
+    for (int i = 0; i < n; i++)
+      addVariable (c[i]);
     return n;
   }
 
@@ -77,9 +78,7 @@ class poly_formatter
   void addPolynomials (const std::string *p, int n)
   {
     for (int i = 0; i < n; i++)
-      {
-        addPolynomial(p[i]);
-      }
+      addPolynomial(p[i]);
   }
   
   protected:

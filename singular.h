@@ -87,7 +87,7 @@ class singular : public poly_formatter<poly>
     if (debug) std::cerr << "-------Calling addPolynomial on " << p << std::endl;
     size_t start = 0, end = p.length ();
     int monomialCount = 0;
-// term is negative , the ’−’ needs to be position 0
+    // term is negative , the ’−’ needs to be position 0
     poly thisPoly;
     while (start <= p.length () - 1)
       {
